@@ -43,18 +43,57 @@ public class Main {
     }
 
     private static boolean isOreNumber(int x) {
-        int count = 1;
+        int count = 2;
+        BigDecimal fraction;
         BigDecimal one = new BigDecimal(1);
         MathContext mc = new MathContext(20, RoundingMode.CEILING);
+
         BigDecimal invSum = one.divide(new BigDecimal((double)x), mc);
-        for (int d = 1; d <= x/2; d++) {
+        invSum = invSum.add(one);
+
+        int xSqFloor = (int)Math.floor(Math.sqrt(x));
+        int d2;
+
+//        System.out.println("X=" + x);
+//        System.out.println("xSqFloor=" + xSqFloor);
+        for (int d = 2; d < xSqFloor; d++) {
             if (x % d == 0) {
-                count++;
-                BigDecimal fraction = one.divide(new BigDecimal(d), mc);
+                count += 2;
+                fraction = one.divide(new BigDecimal(d), mc);
                 invSum = invSum.add(fraction);
+//                System.out.println("d=" + d);
+//                System.out.println("Fraction: " + fraction);
+
+                d2 = x / d;
+                fraction = one.divide(new BigDecimal(d2), mc);
+                invSum = invSum.add(fraction);
+//                System.out.println("d2=" + d2);
+//                System.out.println("Fraction: " + fraction);
             }
         }
+        if (x == xSqFloor * xSqFloor)
+        {
+            count++;
+            fraction = one.divide(new BigDecimal(xSqFloor), mc);
+            invSum = invSum.add(fraction);
+
+        }
+        else if (x % xSqFloor == 0)
+        {
+            count += 2;
+            fraction = one.divide(new BigDecimal(xSqFloor), mc);
+            invSum = invSum.add(fraction);
+
+            d2 = x / xSqFloor;
+            fraction = one.divide(new BigDecimal(d2), mc);
+            invSum = invSum.add(fraction);
+        }
+
+//        System.out.println("InvSum=" + invSum);
+//        System.out.println("count=" + count);
+
         BigDecimal harmonicMean = new BigDecimal(count).divide(invSum, mc);
+//        System.out.println("Harmonic mean: " + harmonicMean + "\n");
 
         if (isIntegerValue(harmonicMean)) {
             return true;
@@ -65,7 +104,7 @@ public class Main {
     public static void main(String[] args) {
         int nr_threads = 8;
 	    int a = 1;
-	    int b = 500000;
+	    int b = 10000000;
 
         long startTime = System.currentTimeMillis();
         List<Thread> threads = new ArrayList<>();
@@ -90,7 +129,7 @@ public class Main {
         for (OreNumbers o: oreNumbers) {
             List<Integer> nums = o.getNums();
             for (int i: nums) {
-                System.out.print(i + " ");
+                System.out.print(i + "\n");
             }
             System.out.println();
         }
